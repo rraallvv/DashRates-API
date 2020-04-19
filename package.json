@@ -1,5 +1,5 @@
 {
-  "name": "dashrates-api",
+  "name": "nimiqrates-api",
   "version": "0.2.6",
   "description": "",
   "main": "server.js",

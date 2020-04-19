@@ -34,8 +34,8 @@ exports.BTCCoingecko = function(url, [...currencies]) {
   })
 }
 
-// get dash's average trading price from various exchanges
-exports.DASHCryptoCompareAvg = function(url) {
+// get nimiq's average trading price from various exchanges
+exports.NIMIQCryptoCompareAvg = function(url) {
   let output = {}
   const cacheRef = '_cachedCryptoCompareAvg'
 
@@ -65,9 +65,9 @@ exports.DASHCryptoCompareAvg = function(url) {
   })
 }
 
-// get the current DASH trading price from Poloniex
-exports.DASHPoloniex = function(url) {
-  const cacheRef = '_cachedPoloniexDash'
+// get the current NIMIQ trading price from Poloniex
+exports.NIMIQPoloniex = function(url) {
+  const cacheRef = '_cachedPoloniexNimiq'
 
   return new Promise(resolve => {
     cache.get(cacheRef, function(error, data) {
@@ -75,13 +75,13 @@ exports.DASHPoloniex = function(url) {
       // if the data is in cache, return that
       if (!!data) {
         resolve(JSON.parse(data))
-        console.log('Grabbed _cachedPoloniexDash')
+        console.log('Grabbed _cachedPoloniexNimiq')
       } else {
         axios.get(url)
           .then(result => {
             let total = 0
             let amount = 0
-            // loop through the results and get the total BTC traded, and the amount of DASH traded
+            // loop through the results and get the total BTC traded, and the amount of NIMIQ traded
             for (var i = 0; i < result.data.length; i++) {
               total += parseFloat(result.data[i].total)
               amount += parseFloat(result.data[i].amount)
@@ -101,9 +101,9 @@ exports.DASHPoloniex = function(url) {
   })
 }
 
-// get the current BTC/DASH price - we grab the "last" price from bitcoinaverage to get the most recent exchange rate
-exports.CoingeckoDashBtc = function (url) {
-  const cacheRef = '_cachedDashBTC'
+// get the current BTC/NIMIQ price - we grab the "last" price from bitcoinaverage to get the most recent exchange rate
+exports.CoingeckoNimiqBtc = function (url) {
+  const cacheRef = '_cachedNimiqBTC'
 
   return new Promise(resolve => {
     cache.get(cacheRef, function(error, data) {
@@ -111,11 +111,11 @@ exports.CoingeckoDashBtc = function (url) {
       // if the data is in cache, return that
       if (!!data) {
         resolve(JSON.parse(data))
-        console.log('Grabbed _cachedDashBTC')
+        console.log('Grabbed _cachedNimiqBTC')
       } else {
         axios.get(url)
           .then(result => {
-            const last = result.data['dash']['btc']
+            const last = result.data['nimiq-2']['btc']
             // set the cache for this response and save for 60 seconds
             cache.setex(cacheRef, 60, JSON.stringify(last))
             resolve(last)
@@ -131,7 +131,7 @@ exports.CoingeckoDashBtc = function (url) {
 
 //get the current BTC/VES price from LocalBitcoins API
 exports.BTCLocalBitcoinsVes = function (url) {
-  const cacheRef = '_cachedDashLocalBitcoinsVes'
+  const cacheRef = '_cachedNimiqLocalBitcoinsVes'
 
   return new Promise(resolve => {
     cache.get(cacheRef, function (error, data) {
@@ -162,7 +162,7 @@ exports.invoice = function(address, amount) {
     const data = {
       'address': address,
       'amount': amount,
-      'network': 'dash',
+      'network': 'nimiq',
       'api_key': process.env.API_KEY
     }
 
@@ -185,11 +185,11 @@ exports.invoice = function(address, amount) {
   })
 }
 
-// get invoice number from DashText
-exports.dashText = function(address, amount) {
+// get invoice number from NimiqText
+exports.nimiqText = function(address, amount) {
   return new Promise(resolve => {
 
-    const token = process.env.DASH_TEXT
+    const token = process.env.NIMIQ_TEXT
     const data = `address=${address}&amount=${amount}&token=${token}`
 
     const headers = {
@@ -199,7 +199,7 @@ exports.dashText = function(address, amount) {
       }
     }
 
-    axios.post('https://api.dashtext.io/apibuy.php', data)
+    axios.post('https://api.nimiqtext.io/apibuy.php', data)
       .then((res) => {
         console.log(res.data)
         resolve(res.data.code)

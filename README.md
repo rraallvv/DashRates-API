@@ -1,12 +1,12 @@
-# DashRates REST API Documentaion
+# NimiqRates REST API Documentaion
 
 ## Installation
 
 Clone repo
-`git clone https://github.com/kodaxx/DashRates-API.git dashrates-api`
+`git clone https://github.com/rraallvv/NimiqRates-API.git nimiqrates-api`
 
 Change into directory
-`cd dashrates-api`
+`cd nimiqrates-api`
 
 Install NPM packages
 `npm install`
@@ -75,7 +75,7 @@ This endpoint returns an object with every supported currency, in alphabetical o
 
 There are currently 167 supported exchange rates.
 
-### Get average DASH trading price
+### Get average NIMIQ trading price
 
 - #### Endpoint
     `https://host.com/avg`
@@ -86,9 +86,9 @@ There are currently 167 supported exchange rates.
     ```js
     0.02474
     ```
-This is the average DASH price across Binance, Kraken, Poloniex, and Bitfinex
+This is the average NIMIQ price across Binance, Kraken, Poloniex, and Bitfinex
 
-### Get Coingecko DASH trading price
+### Get Coingecko NIMIQ trading price
 
 - #### Endpoint
     `https://host.com/coingecko`
@@ -100,7 +100,7 @@ This is the average DASH price across Binance, Kraken, Poloniex, and Bitfinex
     0.02412598
     ```
 
-### Get Poloniex DASH trading price
+### Get Poloniex NIMIQ trading price
 
 - #### Endpoint
     `https://host.com/poloniex`

@@ -4,9 +4,9 @@ const providers = require('./providers')
 
 // set URLs
 const btc2fiatUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin'
-const dash2btcUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=dash&vs_currencies=btc'
-const poloniexDashUrl = 'https://poloniex.com/public?command=returnTradeHistory&currencyPair=BTC_DASH'
-const averageUrl = 'https://min-api.cryptocompare.com/data/generateAvg?fsym=DASH&tsym=BTC&e=Binance,Kraken,Poloniex,Bitfinex'
+const nimiq2btcUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=nimiq-2&vs_currencies=btc'
+const poloniexNimiqUrl = 'https://poloniex.com/public?command=returnTradeHistory&currencyPair=BTC_NIM'
+const averageUrl = 'https://min-api.cryptocompare.com/data/generateAvg?fsym=NIM&tsym=BTC&e=Binance,Kraken,Poloniex,Bitfinex'
 const btcLocalBitcoinsUrl = 'https://localbitcoins.com/bitcoinaverage/ticker-all-currencies'
 
 // prettify json
@@ -19,9 +19,9 @@ new CronJob('0 */1 * * * *', async function() {
   // wondering if maybe we don't run these seperately without 'await' we can run them async
   const USD = await providers.BTCCoingecko(btc2fiatUrl, ['USD'])
   console.log(`BTC/USD: ${USD.USD}`)
-  console.log(`Poloniex: ${await providers.DASHPoloniex(poloniexDashUrl)}`)
-  console.log(`DASH Average: ${await providers.DASHCryptoCompareAvg(averageUrl)}`)
-  console.log(`BTC/DASH: ${await providers.CoingeckoDashBtc(dash2btcUrl)}`)
+  // console.log(`Poloniex: ${await providers.NIMIQPoloniex(poloniexNimiqUrl)}`)
+  // console.log(`NIMIQ Average: ${await providers.NIMIQCryptoCompareAvg(averageUrl)}`)
+  console.log(`BTC/NIMIQ: ${await providers.CoingeckoNimiqBtc(nimiq2btcUrl)}`)
   console.log(`BTC/VES: ${await providers.BTCLocalBitcoinsVes(btcLocalBitcoinsUrl)}`)
 
   console.log('Cache Refreshed');
@@ -60,36 +60,36 @@ app.get('/loaderio-5c8ed429de43ac44e439a90752086c1d', function(req, res) {
 
 // get CryptoCompare average trading price
 app.get('/avg', async function(req, res) {
-  let price = await providers.DASHCryptoCompareAvg(averageUrl)
+  let price = await providers.NIMIQCryptoCompareAvg(averageUrl)
   res.json(price)
 })
 
 // get Poloniex trading price
 app.get('/poloniex', async function(req, res) {
-  let price = await providers.DASHPoloniex(poloniexDashUrl)
+  let price = await providers.NIMIQPoloniex(poloniexNimiqUrl)
   res.json(price)
 })
 
 // get Coingecko trading price
 app.get('/coingecko', async function(req, res) {
-  let price = await providers.CoingeckoDashBtc(dash2btcUrl)
+  let price = await providers.CoingeckoNimiqBtc(nimiq2btcUrl)
   res.json(price)
 })
 
 app.get('/invoice', async function(req, res) {
-  // http://localhost:3000/invoice?addr=XguWWTJUciSsADfHBqHynqF6vwyM2rWib4&amount=22500
+  // http://localhost:3000/invoice?addr=NQXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX&amount=22500
   const address = req.query.addr
   const amount = parseInt(req.query.amount)
 
   res.json(await providers.invoice(address, amount))
 })
 
-app.get('/dashtext', async function(req, res) {
-  // http://localhost:3000/dashtext?addr=XguWWTJUciSsADfHBqHynqF6vwyM2rWib4&amount=22500
+app.get('/nimiqtext', async function(req, res) {
+  // http://localhost:3000/nimiqtext?addr=NQXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX XXXX&amount=22500
   const address = req.query.addr
   const amount = parseInt(req.query.amount)
 
-  res.json(await providers.dashText(address, amount))
+  res.json(await providers.nimiqText(address, amount))
 })
 
 // get rates
@@ -113,21 +113,22 @@ app.get('/*', async function(req, res) {
   }
   console.log(`get rate: ${currencies}`)
   try {
-    // get current average BTC/FIAT and BTC/DASH exchange rate
+    // get current average BTC/FIAT and BTC/NIMIQ exchange rate
     const rates = await providers.BTCCoingecko(btc2fiatUrl, currencies)
-    const avg = await providers.DASHCryptoCompareAvg(averageUrl)
-    // const poloniex = await getPoloniexDash(poloniexDashUrl)
+    const avg = NaN
+    // const avg = await providers.NIMIQCryptoCompareAvg(averageUrl)
+    // const poloniex = await getPoloniexNimiq(poloniexNimiqUrl)
     const btcVes = await providers.BTCLocalBitcoinsVes(btcLocalBitcoinsUrl)
-    const dash = await providers.CoingeckoDashBtc(dash2btcUrl)
+    const nimiq = await providers.CoingeckoNimiqBtc(nimiq2btcUrl)
     if (currencies.includes('VES') && !!btcVes) {
       rates['VES'] = btcVes
     }
     // 'rates' is an object containing requested fiat rates (ex. USD: 6500)
-    // multiply each value in the object by the current BTC/DASH rate
+    // multiply each value in the object by the current BTC/NIMIQ rate
     for (var key in rates) {
       if (rates.hasOwnProperty(key)) {
         // rates[key] *= poloniex
-        rates[key] *= avg || dash
+        rates[key] *= avg || nimiq
       }
     }
     // return the rates object
@@ -142,4 +143,4 @@ app.get('/*', async function(req, res) {
 // set server
 const port = process.env.PORT || 3000;
 app.listen(port);
-console.log(`DashRates API v0.2.6 running on port http://localhost:${port}`);
+console.log(`NimiqRates API v0.2.6 running on port http://localhost:${port}`);
