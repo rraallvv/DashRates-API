@@ -22,7 +22,7 @@ new CronJob('0 */1 * * * *', async function() {
   // console.log(`Poloniex: ${await providers.NIMIQPoloniex(poloniexNimiqUrl)}`)
   // console.log(`NIMIQ Average: ${await providers.NIMIQCryptoCompareAvg(averageUrl)}`)
   console.log(`BTC/NIMIQ: ${await providers.CoingeckoNimiqBtc(nimiq2btcUrl)}`)
-  console.log(`BTC/VES: ${await providers.BTCLocalBitcoinsVes(btcLocalBitcoinsUrl)}`)
+  console.log(`LocalBitcoins Rates: ${await providers.BTCLocalBitcoins(btcLocalBitcoinsUrl)}`)
 
   console.log('Cache Refreshed');
 
@@ -118,18 +118,15 @@ app.get('/*', async function(req, res) {
     const avg = NaN
     // const avg = await providers.NIMIQCryptoCompareAvg(averageUrl)
     // const poloniex = await getPoloniexNimiq(poloniexNimiqUrl)
-    const btcVes = await providers.BTCLocalBitcoinsVes(btcLocalBitcoinsUrl)
     const nimiq = await providers.CoingeckoNimiqBtc(nimiq2btcUrl)
-    if (currencies.includes('VES') && !!btcVes) {
-      rates['VES'] = btcVes
-    }
     // 'rates' is an object containing requested fiat rates (ex. USD: 6500)
     // multiply each value in the object by the current BTC/NIMIQ rate
-    for (var key in rates) {
-      if (rates.hasOwnProperty(key)) {
-        // rates[key] *= poloniex
-        rates[key] *= avg || nimiq
+    for (var key of currencies) {
+      if (typeof rates[key] !== 'number') {
+        rates[key] = await providers.BTCLocalBitcoins(btcLocalBitcoinsUrl, key)
       }
+      // rates[key] *= poloniex
+      rates[key] *= avg || nimiq
     }
     // return the rates object
     res.json(rates)

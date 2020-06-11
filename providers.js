@@ -130,23 +130,29 @@ exports.CoingeckoNimiqBtc = function (url) {
 }
 
 //get the current BTC/VES price from LocalBitcoins API
-exports.BTCLocalBitcoinsVes = function (url) {
-  const cacheRef = '_cachedNimiqLocalBitcoinsVes'
-
+exports.BTCLocalBitcoins = function (url, coin) {
+  const cacheRef = `_cachedNimiqLocalBitcoins`
   return new Promise(resolve => {
     cache.get(cacheRef, function (error, data) {
       if (error) throw error
       // if the data is in cache, return that
       if (!!data) {
-        resolve(JSON.parse(data))
-        console.log(`Grabbed _${cacheRef}`)
+        resolve(JSON.parse(data)[coin])
+        console.log(`Grabbed _${cacheRef} ${coin}`)
       } else {
         axios.get(url)
           .then(result => {
-            const btcVes = parseFloat(result.data['VES']['rates']['last'])
-            // set the cache for this response and save for 60 seconds
-            cache.setex(cacheRef, 60, btcVes)
-            resolve(btcVes)
+            if (coin) {
+              const rates = {}
+              Object.keys(result.data).map(function(key, index) {
+                rates[key] = result.data[key]['rates']['last']
+              })
+              // set the cache for this response and save for 60 seconds
+              cache.setex(cacheRef, 60, JSON.stringify(rates))
+              resolve(rates[coin])
+            } else {
+              resolve(Object.keys(result.data))
+            }
           }).catch(error => {
             console.log(`Error: ${error}`)
             resolve(error)
